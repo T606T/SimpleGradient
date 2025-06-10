@@ -2,11 +2,11 @@
 
 SimpleGradient is a lightweight C++ library designed for educational and experimental purposes in numerical optimization. It currently implements a robust one-dimensional gradient descent solver, suitable for understanding core optimization concepts and building a foundation for more advanced methods.
 
-🚧 ## Status: In Development
+## 🚧 Status: In Development
 
 This library is under active development as part of a personal project to master C++ and numerical optimization. The current version supports single-variable function minimization with derivative-based gradient descent and Armijo backtracking line search.
 
-✨ ## Features
+## ✨ Features
 
 Generic templated solver (SimpleGradient<T>) supporting float and double
 
@@ -22,7 +22,7 @@ Second derivative flatness check (D2Check)
 
 Verbose debug output for educational purposes
 
-🧠 ## Motivation
+## 🧠 Motivation
 
 The goal of this project is to:
 
@@ -34,12 +34,12 @@ Strengthen fundamentals in numerical analysis, optimization, and gradient-based 
 
 Create a visible and credible portfolio piece for R&D and systems programming roles
 
-🛠 Planned Features (Checklist)
+## 🛠 Planned Features (Checklist)
 
 
 
-📁 ## Structure
-
+## 📁 Structure
+```
 SimpleGradient/
 ├── include/
 │   └── Gradient.h      # Header-only implementation of SimpleGradient
@@ -47,23 +47,24 @@ SimpleGradient/
 │   └── test.cpp        # Test runner for predefined functions
 ├── DebugFile.txt           # Debug log 
 ├── README.md
+```
 
-🚀 ##Getting Started
-
+## 🚀 Getting Started
+```bash
 $ g++ -Iinclude src/test.cpp -o build/gradient
 $ ./build/gradient
-
-📚 ## Example Use
+```
+## 📚 Example Use
 
 Predefined test cases include quadratic, polynomial, trigonometric, and exponential functions. Each test includes initial guesses and step sizes.
 
 Result Res = Solver.Solve(Functions::Quad, "Quadratic", Derivatives::dQuad, 100, 0.001f, 5, 0.5);
 
-🤝 ## Contributions
+## 🤝 Contributions
 
 Not accepting pull requests yet, but ideas and critiques are welcome.
 
-🧾 ## Author
+## 🧾 Author
 
 This project is developed and maintained by a passionate learner aiming to become a C++ developer in R&D-heavy fields such as control systems, embedded development, scientific computing, or HPC.
 
