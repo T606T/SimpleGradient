@@ -2,7 +2,7 @@
 
 SimpleGradient is a lightweight C++ library designed for educational and experimental purposes in numerical optimization. It currently implements a robust one-dimensional gradient descent solver, suitable for understanding core optimization concepts and building a foundation for more advanced methods.
 
-🚧 ##Status: In Development
+🚧 ## Status: In Development
 
 This library is under active development as part of a personal project to master C++ and numerical optimization. The current version supports single-variable function minimization with derivative-based gradient descent and Armijo backtracking line search.
 
