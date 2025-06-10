@@ -57,8 +57,9 @@ $ ./build/gradient
 ## 📚 Example Use
 
 Predefined test cases include quadratic, polynomial, trigonometric, and exponential functions. Each test includes initial guesses and step sizes.
-
+```cpp
 Result Res = Solver.Solve(Functions::Quad, "Quadratic", Derivatives::dQuad, 100, 0.001f, 5, 0.5);
+```
 
 ## 🤝 Contributions
 
