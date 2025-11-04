@@ -57,7 +57,7 @@ class Log{
 };
 template <typename C> class SimpleGradient{
     private:
-        Log& logger; 
+        Log* logger = nullptr; 
         C Step(C t, C Xn, C Xn1, std::function<C(C)> Deriv, std::function<C(C)> Func){
             float alpha = 1e-4;
             float beta = 0.5;
@@ -67,7 +67,7 @@ template <typename C> class SimpleGradient{
             int attempts = 0;
             while(attempts<max_attempts){
                 if(Func(Xn - t * Deriv(Xn)) <= fxn - alpha * t * pow(dfxn,2)){
-                    if(logger.debug() && DebugFile.is_open()){
+                    if(logger && logger->debug() && DebugFile.is_open()){
                         DebugFile << "[Armijo] t: "<< t << " iteration: " << attempts << "\n";
                     }
                     return t;
@@ -80,7 +80,8 @@ template <typename C> class SimpleGradient{
         }
     public:
         std::fstream DebugFile;
-        SimpleGradient(Log& LOG) : logger(LOG){
+	SimpleGradient() = default;
+        SimpleGradient(Log& logger) : logger(&logger){
             if (logger.debug()){
                 DebugFile.open("DebugFile.txt", std::ios::out | std::ios::trunc);
                 if (!DebugFile.is_open()){
@@ -89,7 +90,7 @@ template <typename C> class SimpleGradient{
             } 
         };
         ~SimpleGradient(){
-            if (logger.debug() && DebugFile.is_open()){
+            if (logger && logger->debug() && DebugFile.is_open()){
                 DebugFile.close();
             }
         };
@@ -98,7 +99,7 @@ template <typename C> class SimpleGradient{
                 auto D2 = [h,Derivative](C X){ return (Derivative(X + h) - Derivative(X - h)) / (2 * h); };
 
                     if ( abs(D2(xn)) < threshold ){
-                        if (logger.trace()){
+                        if (logger && logger->trace()){
                             std::cout<<"D2 = "<<D2(xn)<<"\n";
                         }
                         return false;
@@ -116,7 +117,7 @@ template <typename C> class SimpleGradient{
             float Memo_x = 0;
             int Tolerance = 0.5;
             float threshold = 8*e;
-            if(logger.debug() && DebugFile.is_open()){
+            if(logger && logger->debug() && DebugFile.is_open()){
                 DebugFile << "\n---------------------------------------------------------------\n";
                 DebugFile << FunctionName<<"\n";
             }
@@ -125,7 +126,7 @@ template <typename C> class SimpleGradient{
                 const auto fx = Function(x.result);
                 const auto dfx = Derivative(x.result);
                 //Iteration Counter
-                if(logger.debug() && DebugFile.is_open()){
+                if(logger && logger->debug() && DebugFile.is_open()){
                     DebugFile << "[Algorythm iteration]: "<< i<<"\n";
                 }
                 //Checking if fx Is not-a-number value
@@ -156,7 +157,7 @@ template <typename C> class SimpleGradient{
                     auto fxn = Function(xn);
                     auto fxn1 = Function(xn1);
                     C deltaF = e * (abs(fxn));
-                    if (logger.debug() && DebugFile.is_open()){
+                    if (logger && logger->debug() && DebugFile.is_open()){
                         DebugFile << "[f(xn)]:"<< fxn << "\n";
                         DebugFile << "[f(xn+1)]:"<< fxn << "\n";
                         DebugFile << "[new_dfx]:"<< new_dfx << "\n";
@@ -178,7 +179,7 @@ template <typename C> class SimpleGradient{
                             }
                             else{
                                 //FAIL WHICH FAIL?????
-                                if (logger.trace()){
+                                if (logger && logger->trace()){
                                     x.outcome = "Undefined error"; //To later determine.
                                     x.E_Code = Undefined;
                                     return x;

@@ -113,7 +113,7 @@ std::vector<FunctionConfig> tests = {
     {Functions::Poly, Derivatives::dPoly, 4, 0.05,"Polynomial"}
 }; 
 int main(){
-    SimpleGradient<float> Solver;
+    SimpleGradient<float> SimpleGradient;
     Functions F = Functions::Quad; 
     Derivatives D = Derivatives::dQuad;
 
@@ -123,18 +123,16 @@ int main(){
     int Guess   = 5;
     float step  = 0.5;
     std::string FuncName = " ";
-    std::cout<<"Verbosity Level: "<<endl;
+    std::cout<<"Verbosity Level: "<<std::endl;
     std::string v = "";
     Log LOG; 
-    scanf("%s",v);
-    LOG.Verbosity(v);
+    std::cin >> v;
+    LOG.Verbosity(std::stoi(v));
+
     for(int i= 0; i < enum_size; i++){
         FuncName = (tests[i].name);
-        Res = Solver.Solve(getFunction(tests[i].func),FuncName, getDerivative(tests[i].derv),MaxIter,Error,tests[i].x0,tests[i].step);
+        Res = SimpleGradient.Solve(getFunction(tests[i].func),FuncName, getDerivative(tests[i].derv),MaxIter,Error,tests[i].x0,tests[i].step);
         auto ResDeriv = getDerivative(tests[i].derv);
         printf("Result: %s, x: %f, ẋ:%f, Error_Code: %d\n\n",Res.outcome.c_str(), Res.result,ResDeriv(Res.result),Res.E_Code);
     }
-
-    
-    
 }
