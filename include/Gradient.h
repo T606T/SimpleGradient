@@ -58,7 +58,7 @@ class Log{
 template <typename C> class SimpleGradient{
     private:
         Log* logger = nullptr; 
-        C Step(C t, C Xn, C Xn1, std::function<C(C)> Deriv, std::function<C(C)> Func){
+        C Step(C t, C Xn, std::function<C(C)> Deriv, std::function<C(C)> Func){
             float alpha = 1e-4;
             float beta = 0.5;
             auto dfxn = Deriv(Xn);
@@ -94,7 +94,7 @@ template <typename C> class SimpleGradient{
                 DebugFile.close();
             }
         };
-        bool D2Check(float e,C xn,float threshold,std::function<C(C)> Derivative){
+        bool D2Check(C xn,float threshold,std::function<C(C)> Derivative){
                 const float h = 1e-4;
                 auto D2 = [h,Derivative](C X){ return (Derivative(X + h) - Derivative(X - h)) / (2 * h); };
 
@@ -114,14 +114,16 @@ template <typename C> class SimpleGradient{
             x.outcome = "Fail";
             x.result = initGuess;
             x.E_Code = None;
-            float Memo_x = 0;
-            int Tolerance = 0.5;
+            C xn;
+            C xn1;
+            
             float threshold = 8*e;
             if(logger && logger->debug() && DebugFile.is_open()){
                 DebugFile << "\n---------------------------------------------------------------\n";
                 DebugFile << FunctionName<<"\n";
             }
             std::cout<<"Function: "<<FunctionName<<"\n";
+/////////////////////////////////////////////////////////////////////MAIN FOR LOOP ////////////////////////////////////////////////////////////////////////////
             for (int i = 0; i < max; ++i){
                 const auto fx = Function(x.result);
                 const auto dfx = Derivative(x.result);
@@ -142,12 +144,18 @@ template <typename C> class SimpleGradient{
                     return x;
                 }
                 else{
-                    C xn = x.result;
-                    //ITERATE NEW Xn
-                    x.result = x.result - step*Derivative(x.result); 
-                    C xn1 = x.result;
-                    step = Step(step,xn,xn1,Derivative,Function);
-                    if (step == -1){
+                    xn = x.result;
+                    //Check the learning rate to fulfill Armijo condition.
+                    float memo_step = step;
+                    step = Step(step,xn,Derivative,Function);
+                    //Should Armijo Fail do a rollback.
+                    if(step < 0){
+                        step = memo_step * 0.5;
+                    }
+////////////////////ITERATE NEW Xn///////////////////////////////////////////////////////////
+                    xn1 = x.result - step*Derivative(x.result); 
+
+                    else if (step == -1){
                         x.outcome = "Growing Gradient";
                         x.E_Code = Growing_Gradient;
                         return x; 
@@ -162,9 +170,10 @@ template <typename C> class SimpleGradient{
                         DebugFile << "[f(xn+1)]:"<< fxn << "\n";
                         DebugFile << "[new_dfx]:"<< new_dfx << "\n";
                     }
+
                     if (abs(dfx)<e){
                         if(abs(xn1 - xn) < deltaX){
-                            if(D2Check(e,xn,threshold,Derivative)){
+                            if(D2Check(xn,threshold,Derivative)){
                             x.outcome = "SUCCESS";
                             x.E_Code = None;
                             return x;
@@ -197,7 +206,9 @@ template <typename C> class SimpleGradient{
                         }
 
                     } 
-                }   
+                }
+                //////NOT SURE ABOUT THIS/// COULD DELETE LATER
+                step *= 1.05f;  
             }
             x.outcome = "Max Iterations";
             x.E_Code = Max_Iterations;

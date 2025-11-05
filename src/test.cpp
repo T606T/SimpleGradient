@@ -114,14 +114,12 @@ std::vector<FunctionConfig> tests = {
 }; 
 int main(){
     SimpleGradient<float> SimpleGradient;
-    Functions F = Functions::Quad; 
-    Derivatives D = Derivatives::dQuad;
+//    Functions F = Functions::Quad; 
+//    Derivatives D = Derivatives::dQuad;
 
     Result Res;
     int MaxIter = 100;
     float Error = 0.001f;
-    int Guess   = 5;
-    float step  = 0.5;
     std::string FuncName = " ";
     std::cout<<"Verbosity Level: "<<std::endl;
     std::string v = "";
