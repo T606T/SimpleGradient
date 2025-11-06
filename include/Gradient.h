@@ -114,25 +114,28 @@ template <typename C> class SimpleGradient{
             x.outcome = "Fail";
             x.result = initGuess;
             x.E_Code = None;
+            auto fx = Function(x.result);         //F(Xn)
+            auto dfx = Derivative(x.result);      //dF(Xn)
+            const float Tolerance = 1e-5f;        //Tolerance for dF(Xn) when it reaches enough closeness to 0. 
             C xn;
             C xn1;
-            
+            step = std::min(step, 1.0f / (1.0f + std::fabs(dfx)));
             float threshold = 8*e;
             if(logger && logger->debug() && DebugFile.is_open()){
                 DebugFile << "\n---------------------------------------------------------------\n";
                 DebugFile << FunctionName<<"\n";
             }
-            std::cout<<"Function: "<<FunctionName<<"\n";
+            
 /////////////////////////////////////////////////////////////////////MAIN FOR LOOP ////////////////////////////////////////////////////////////////////////////
             for (int i = 0; i < max; ++i){
-                const auto fx = Function(x.result);
-                const auto dfx = Derivative(x.result);
+                fx = Function(x.result);
+                dfx = Derivative(x.result);
                 //Iteration Counter
                 if(logger && logger->debug() && DebugFile.is_open()){
                     DebugFile << "[Algorythm iteration]: "<< i<<"\n";
                 }
                 //Checking if fx Is not-a-number value
-                if(std::isnan(fx)){
+                if(std::isnan(fx) || !std::isfinite(fx)){
                     x.outcome = "Divergent Solution";
                     x.E_Code = Diverging_Solution;
                     return x;
@@ -153,9 +156,9 @@ template <typename C> class SimpleGradient{
                         step = memo_step * 0.5;
                     }
 ////////////////////ITERATE NEW Xn///////////////////////////////////////////////////////////
-                    xn1 = x.result - step*Derivative(x.result); 
-
-                    else if (step == -1){
+                    x.result = x.result - step*Derivative(x.result); 
+                    xn1 = x.result;
+                    if (step == -1){
                         x.outcome = "Growing Gradient";
                         x.E_Code = Growing_Gradient;
                         return x; 
@@ -208,7 +211,12 @@ template <typename C> class SimpleGradient{
                     } 
                 }
                 //////NOT SURE ABOUT THIS/// COULD DELETE LATER
-                step *= 1.05f;  
+                step *= 1.05f;
+                if(fabs(dfx) < Tolerance){
+                    x.outcome = "SUCCESS";
+                    x.E_Code = None;
+                    return x;
+                }  
             }
             x.outcome = "Max Iterations";
             x.E_Code = Max_Iterations;

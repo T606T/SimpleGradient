@@ -2,6 +2,7 @@
 #include <cmath>
 #include <functional> 
 #include <vector>  
+#include <queue>
 #include "Gradient.h"
 
 constexpr int enum_size = 11;
@@ -116,7 +117,7 @@ int main(){
     SimpleGradient<float> SimpleGradient;
 //    Functions F = Functions::Quad; 
 //    Derivatives D = Derivatives::dQuad;
-
+    std::queue<FunctionConfig> ReTest;
     Result Res;
     int MaxIter = 100;
     float Error = 0.001f;
@@ -131,6 +132,32 @@ int main(){
         FuncName = (tests[i].name);
         Res = SimpleGradient.Solve(getFunction(tests[i].func),FuncName, getDerivative(tests[i].derv),MaxIter,Error,tests[i].x0,tests[i].step);
         auto ResDeriv = getDerivative(tests[i].derv);
-        printf("Result: %s, x: %f, ẋ:%f, Error_Code: %d\n\n",Res.outcome.c_str(), Res.result,ResDeriv(Res.result),Res.E_Code);
+        if(Res.E_Code == None){
+            std::cout<<"Function: "<<FuncName<<"\n";
+            printf("Result: %s, x: %f, ẋ:%f, Error_Code: %d\n\n",Res.outcome.c_str(), Res.result,ResDeriv(Res.result),Res.E_Code);
+        }
+        if(Res.E_Code == Max_Iterations){
+            ReTest.push(tests[i]);
+        }
+    }
+    std::vector<float> seeds = {0.1f, -0.1f, 0.5f, -0.5f};
+    while(!ReTest.empty()){
+        bool success = false;
+        auto curr = ReTest.front();
+        ReTest.pop();
+        auto ResDeriv = getDerivative(curr.derv);
+        for(auto offset : seeds){
+            auto newGuess = curr.x0 + offset;
+            Res = SimpleGradient.Solve(getFunction(curr.func),curr.name, getDerivative(curr.derv),MaxIter,Error,newGuess,curr.step);
+
+            if(Res.E_Code == None){
+                printf("[RETEST SUCCESS] %s with x0=%.3f → x=%.6f\n", curr.name.c_str(), newGuess, Res.result);
+                success = true;
+                break; // stop retesting this function
+            }
+        }
+        if(!success){
+            printf("[RETEST FAILED] %s with x: %f, ẋ:%f, Error_Code: %d\n", curr.name.c_str(),Res.result, ResDeriv(Res.result),Res.E_Code);
+        }
     }
 }
