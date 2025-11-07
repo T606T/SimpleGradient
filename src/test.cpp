@@ -136,8 +136,12 @@ int main(){
             std::cout<<"Function: "<<FuncName<<"\n";
             printf("Result: %s, x: %f, ẋ:%f, Error_Code: %d\n\n",Res.outcome.c_str(), Res.result,ResDeriv(Res.result),Res.E_Code);
         }
-        if(Res.E_Code == Max_Iterations){
+        else if(Res.E_Code == Max_Iterations){
             ReTest.push(tests[i]);
+        }
+        else{
+            std::cout<<"Function: "<<FuncName<<"\n";
+            printf("Result: %s, x: %f, ẋ:%f, Error_Code: %d\n\n",Res.outcome.c_str(), Res.result,ResDeriv(Res.result),Res.E_Code);
         }
     }
     std::vector<float> seeds = {0.1f, -0.1f, 0.5f, -0.5f};

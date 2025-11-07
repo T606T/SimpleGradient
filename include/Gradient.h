@@ -17,7 +17,8 @@ enum Error{
     Growing_Gradient,       //6
     Inflection_Point,       //7
     NaN,                    //8
-    Undefined               //9
+    Undefined,              //9
+    Stalled                 //10
 };
 struct Result{
     std::string outcome = "Fail";
@@ -190,7 +191,6 @@ template <typename C> class SimpleGradient{
                                 return x;
                             }
                             else{
-                                //FAIL WHICH FAIL?????
                                 if (logger && logger->trace()){
                                     x.outcome = "Undefined error"; //To later determine.
                                     x.E_Code = Undefined;
@@ -210,14 +210,26 @@ template <typename C> class SimpleGradient{
 
                     } 
                 }
-                //////NOT SURE ABOUT THIS/// COULD DELETE LATER
+                
                 step *= 1.05f;
                 if(fabs(dfx) < Tolerance){
                     x.outcome = "SUCCESS";
                     x.E_Code = None;
                     return x;
+                }
+                //TO fix because the algorythm sometimes confuses this outcome with converged late.
+                if (std::fabs(dfx) < 1e-3 && std::fabs(xn1 - xn) < e) {
+                    x.outcome = "Flat Region (stalled)";
+                    x.E_Code = Stalled;
+                    return x;
                 }  
             }
+            if (std::fabs(Derivative(x.result)) < e * 10) {
+                x.outcome = "Converged Late";
+                x.E_Code = None;
+                return x;
+            }
+
             x.outcome = "Max Iterations";
             x.E_Code = Max_Iterations;
             return x; 
