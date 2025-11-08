@@ -110,7 +110,7 @@ template <typename C> class SimpleGradient{
                     }
             }
 
-        Result Solve(std::function<C(C)> Function,std::string FunctionName, std::function<C(C)> Derivative, int max, float e, C initGuess,C step){
+        Result Solve(std::function<C(const std::vector<C>&)> Function,std::string FunctionName, std::function<C(const std::vector<C>&)> Derivative, int max, float e, std::vector<C>& initGuess,C step){
             Result x;
             x.outcome = "Fail";
             x.result = initGuess;
